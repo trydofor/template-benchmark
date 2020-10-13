@@ -40,3 +40,24 @@ Example Results
 ===============
 
 ![Template Comparison](results.png)
+
+Result in Precision 5510
+========================
+
+```
+Result "com.mitchellbosecke.benchmark.Velocity.benchmark":
+  18956.594 ±(99.9%) 766.578 ops/s [Average]
+  (min, avg, max) = (12635.749, 18956.594, 20754.686), stdev = 1548.525
+  CI (99.9%): [18190.016, 19723.172] (assumes normal distribution)
+# Run complete. Total time: 01:27:47
+```
+
+| Benchmark            | Mode  | Cnt |       Score |    Error | Units |
+|:---------------------|:------|:----|------------:|---------:|:------|
+| Freemarker.benchmark | thrpt | 50  | 18152.915 ± |  928.830 | ops/s |
+| Mustache.benchmark   | thrpt | 50  | 22565.064 ± |  154.915 | ops/s |
+| Pebble.benchmark     | thrpt | 50  | 34311.017 ± |  248.283 | ops/s |
+| Rocker.benchmark     | thrpt | 50  | 37499.123 ± | 1275.888 | ops/s |
+| Thymeleaf.benchmark  | thrpt | 50  |  5406.186 ± |  177.424 | ops/s |
+| Trimou.benchmark     | thrpt | 50  | 19718.903 ± |  669.759 | ops/s |
+| Velocity.benchmark   | thrpt | 50  | 18956.594 ± |  766.578 | ops/s |
