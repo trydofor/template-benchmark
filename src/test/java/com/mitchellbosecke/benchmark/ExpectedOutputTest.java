@@ -1,21 +1,21 @@
 package com.mitchellbosecke.benchmark;
 
-import static org.junit.Assert.assertEquals;
+import com.mitchellbosecke.pebble.error.PebbleException;
+import freemarker.template.TemplateException;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Locale;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import com.mitchellbosecke.pebble.error.PebbleException;
-
-import freemarker.template.TemplateException;
+import static org.junit.Assert.assertEquals;
 
 /**
- *
  * @author Martin Kouba
  */
 public class ExpectedOutputTest {
@@ -26,62 +26,92 @@ public class ExpectedOutputTest {
     }
 
     @Test
+    public void testMeepoOutput() throws IOException {
+        Meepo meepo = new Meepo();
+        meepo.setup();
+        assertOutput("meepo", meepo.benchmark());
+    }
+
+    @Test
     public void testFreemarkerOutput() throws IOException, TemplateException {
         Freemarker freemarker = new Freemarker();
         freemarker.setup();
-        assertOutput(freemarker.benchmark());
+        assertOutput("freemarker", freemarker.benchmark());
     }
-    
+
     @Test
     public void testRockerOutput() throws IOException, TemplateException {
         Rocker rocker = new Rocker();
         rocker.setup();
-        assertOutput(rocker.benchmark());
+        assertOutput("rocker", rocker.benchmark());
     }
 
     @Test
     public void testPebbleOutput() throws IOException, PebbleException {
         Pebble pebble = new Pebble();
         pebble.setup();
-        assertOutput(pebble.benchmark());
+        assertOutput("pebble", pebble.benchmark());
     }
 
     @Test
     public void testVelocityOutput() throws IOException {
         Velocity velocity = new Velocity();
         velocity.setup();
-        assertOutput(velocity.benchmark());
+        assertOutput("velocity", velocity.benchmark());
     }
 
     @Test
     public void testMustacheOutput() throws IOException {
         Mustache mustache = new Mustache();
         mustache.setup();
-        assertOutput(mustache.benchmark());
+        assertOutput("mustache", mustache.benchmark());
     }
 
     @Test
     public void testThymeleafOutput() throws IOException, TemplateException {
         Thymeleaf thymeleaf = new Thymeleaf();
         thymeleaf.setup();
-        assertOutput(thymeleaf.benchmark());
+        assertOutput("thymeleaf", thymeleaf.benchmark());
     }
 
     @Test
     public void testTrimouOutput() throws IOException {
         Trimou trimou = new Trimou();
         trimou.setup();
-        assertOutput(trimou.benchmark());
+        assertOutput("trimou", trimou.benchmark());
     }
 
-    private void assertOutput(String output) throws IOException {
-        assertEquals(readExpectedOutputResource(), output.replaceAll("\\s", ""));
+    private void assertOutput(String type, String output) throws IOException {
+        String actual = output.replaceAll("\\s", "");
+        String expected = readExpectedOutputResource();
+        try {
+            assertEquals(expected, actual);
+        } catch (Throwable e) {
+            writeToFile(type, actual);
+            writeToFile("expected", expected);
+            throw e;
+        }
+    }
+
+    private int count = 1;
+
+    private void writeToFile(String type, String content) {
+        Path path = Paths.get("./" + type + (count++) + ".txt");
+        System.out.println("=========");
+        System.out.println(path.toAbsolutePath());
+        System.out.println("=========");
+        try {
+            Files.write(path, content.getBytes());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private String readExpectedOutputResource() throws IOException {
         StringBuilder builder = new StringBuilder();
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(ExpectedOutputTest.class.getResourceAsStream("/expected-output.html")))) {
-            for (;;) {
+        String name = "/expected-output.html";
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(ExpectedOutputTest.class.getResourceAsStream(name)))) {
+            for (; ; ) {
                 String line = in.readLine();
                 if (line == null)
                     break;
